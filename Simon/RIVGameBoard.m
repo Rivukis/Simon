@@ -17,6 +17,8 @@ const NSInteger sixthColorLevel = 10;
 @property (assign, nonatomic) NSInteger nextColorIndex;
 @property (assign, nonatomic) NSInteger highestLevelCompleted;
 
+@property (assign, nonatomic) BOOL gameIsOver;
+
 @end
 
 @implementation RIVGameBoard
@@ -26,18 +28,22 @@ const NSInteger sixthColorLevel = 10;
     self = [super init];
     if (self) {
         self.highestLevelCompleted = [[NSUserDefaults standardUserDefaults] integerForKey:@"highestLevelCompleted"];
+        self.gameIsOver = YES;
     }
     return self;
 }
 
 - (void)newGame
 {
+    self.gameIsOver = NO;
     self.colorSequence = [NSMutableArray new];
     [self advanceToNextRound];
 }
 
 - (RIVGameBoardPlayOutcome)playColor:(RIVGameBoardColor)color
 {
+    if (self.gameIsOver) return RIVGameBoardPlayOutcomeNotPlayable;
+    
     if (color == [self.colorSequence[self.nextColorIndex] integerValue]) {
         self.nextColorIndex++;
         if (self.nextColorIndex >= self.colorSequence.count) {
@@ -48,6 +54,7 @@ const NSInteger sixthColorLevel = 10;
         }
     }
     
+    self.gameIsOver = YES;
     return RIVGameBoardPlayOutcomeIncorrect;
 }
 

@@ -23,7 +23,8 @@ typedef NS_ENUM(NSInteger, RIVGameBoardColor) {
 typedef NS_ENUM(NSInteger, RIVGameBoardPlayOutcome) {
     RIVGameBoardPlayOutcomeIncorrect = 1,
     RIVGameBoardPlayOutcomeCorrect,
-    RIVGameBoardPlayOutcomeLevelComplete
+    RIVGameBoardPlayOutcomeLevelComplete,
+    RIVGameBoardPlayOutcomeNotPlayable
 };
 
 @interface RIVGameBoard : NSObject
