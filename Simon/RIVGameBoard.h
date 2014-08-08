@@ -29,7 +29,7 @@ typedef NS_ENUM(NSInteger, RIVGameBoardPlayOutcome) {
 
 @interface RIVGameBoard : NSObject
 
-@property (readonly, nonatomic) NSMutableArray *colorSequence; // of RIVGameBoardPlayOutCome
+@property (readonly, nonatomic) NSMutableArray *colorSequence; // of RIVGameBoardColor
 @property (readonly, nonatomic) NSInteger nextColorIndex;
 @property (readonly, nonatomic) NSInteger highestLevelCompleted;
 

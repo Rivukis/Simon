@@ -11,7 +11,9 @@
 #import "UIColor+RivCustomColors.h"
 #import "RIVColorView.h"
 
-@interface RIVViewController () <RIVColorViewDelegate>
+@interface RIVViewController () <RIVColorViewDelegate> {
+    NSInteger numberOfRuns;
+}
 
 @property (weak, nonatomic) IBOutlet UILabel *highestLevelAchievedLabel;
 @property (weak, nonatomic) IBOutlet UILabel *currentLevelLabel;
@@ -24,6 +26,8 @@
 @property (strong, nonatomic) RIVColorView *yellowView;
 @property (strong, nonatomic) RIVColorView *magentaView;
 @property (strong, nonatomic) RIVColorView *cyanView;
+
+@property (strong, nonatomic) NSTimer *showTimer;
 
 @end
 
@@ -113,7 +117,7 @@
 
 - (void)moveFirstFourColorViewsInPlace
 {
-    [UIView animateWithDuration:1.5 animations:^{
+    [UIView animateWithDuration:1.0 animations:^{
         self.redView.frame = CGRectMake(20, 118, 130, 130);
         self.greenView.frame = CGRectMake(170, 118, 130, 130);
         self.blueView.frame = CGRectMake(20, 268, 130, 130);
@@ -138,7 +142,7 @@
 
 - (void)moveSixthColorViewInPlace
 {
-    [UIView animateWithDuration:1.5 animations:^{
+    [UIView animateWithDuration:1.0 animations:^{
         self.magentaView.frame = CGRectMake(20, 418, 130, 130);
         self.cyanView.frame = CGRectMake(170, 418, 130, 130);
     } completion:^(BOOL finished) {
@@ -152,13 +156,16 @@
 
 - (IBAction)newGamePressed:(UIButton *)sender
 {
+    [self.showTimer invalidate];
+    
     [UIView animateWithDuration:1.5 animations:^{
         self.magentaView.frame = CGRectMake(20 + 75, 418 + 400, 130, 130);
         self.cyanView.frame = CGRectMake(170 + 400, 418, 130, 130);
     } completion:^(BOOL finished) {
         self.currentLevelLabel.text = @"Current Level: 0";
         [self.gameboard newGame];
-        [self makeColorViewsSelectable:YES];
+        [self showGameSequence];
+//        [self makeColorViewsSelectable:YES];
         NSLog(@"%@", self.gameboard.colorSequence.description);
     }];
 }
@@ -190,12 +197,44 @@
             if (self.gameboard.colorSequence.count == fifthColorLevel) [self moveFifthColorViewInPlace];
             if (self.gameboard.colorSequence.count == sixthColorLevel) [self moveSixthColorViewInPlace];
             
-            NSLog(@"%@", [self.gameboard.colorSequence.lastObject description]);
+            [self makeColorViewsSelectable:NO];
+            [self showGameSequence];
             break;
         case RIVGameBoardPlayOutcomeNotPlayable:
             NSLog(@"you can't play that");
             break;
     }
 }
+
+- (void)showGameSequence
+{
+    numberOfRuns = 9;
+    
+    self.showTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 target:self selector:@selector(makeColorViewHighlightedOrNot) userInfo:nil repeats:YES];
+    [self.showTimer fire];
+}
+                        
+- (void)makeColorViewHighlightedOrNot
+{
+    if (numberOfRuns < 10) {
+        numberOfRuns++;
+        return;
+    }
+    
+    BOOL willHighlight = (numberOfRuns % 2 == 0);
+    NSInteger indexOfColor = (numberOfRuns - 10) / 2;
+    
+    RIVColorView *colorView = (RIVColorView *)[self.view viewWithTag:[self.gameboard.colorSequence[indexOfColor] integerValue]];
+    colorView.isHighlighted = willHighlight;
+    
+    if (indexOfColor == self.gameboard.colorSequence.count - 1 && !willHighlight) {
+        [self makeColorViewsSelectable:YES];
+        [self.showTimer invalidate];
+        return;
+    }
+    
+    numberOfRuns++;
+}
+
 
 @end

@@ -20,7 +20,10 @@
 
 @property (unsafe_unretained, nonatomic) id<RIVColorViewDelegate> delegate;
 @property (assign, nonatomic) BOOL isSelectable;
+@property (assign, nonatomic) BOOL isHighlighted;
 
 - (instancetype)initWithHighlightedColor:(UIColor *)highlightedColor unhighlightedColor:(UIColor *)unhighlightedColor frame:(CGRect)frame;
+- (void)makeHighlighted;
+- (void)makeUnhighlighted;
 
 @end

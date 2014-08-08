@@ -13,7 +13,7 @@ const NSInteger sixthColorLevel = 10;
 
 @interface RIVGameBoard ()
 
-@property (strong, nonatomic) NSMutableArray *colorSequence; // of RIVGameBoardPlayOutCome
+@property (strong, nonatomic) NSMutableArray *colorSequence; // of RIVGameBoardColor
 @property (assign, nonatomic) NSInteger nextColorIndex;
 @property (assign, nonatomic) NSInteger highestLevelCompleted;
 

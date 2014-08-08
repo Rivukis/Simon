@@ -11,7 +11,6 @@
 
 @interface RIVColorView ()
 
-@property (assign, nonatomic) BOOL isHighlighted;
 @property (strong, nonatomic) UIColor *highlightedColor;
 @property (strong, nonatomic) UIColor *unhighlightedColor;
 
@@ -28,7 +27,7 @@
     self.unhighlightedColor = unhighlightedColor;
     self.isHighlighted = NO;
     
-    [self setupGestures];
+    [self setupGesture];
     
     return self;
 }
@@ -42,7 +41,7 @@
     return self;
 }
 
-- (void)setupGestures
+- (void)setupGesture
 {
     UILongPressGestureRecognizer *longPressedGesture = [[UILongPressGestureRecognizer alloc]
                                                         initWithTarget:self action:@selector(touchWithLongPressGesture:)];
@@ -56,14 +55,18 @@
 
 - (void)touchWithLongPressGesture:(UILongPressGestureRecognizer *)longPressGesture
 {
-    if (!self.isSelectable) return;
+    if (!self.isSelectable) {
+        [self removeGestureRecognizer:longPressGesture];
+        [self setupGesture];
+        return;
+    }
     
     BOOL isInView = [self gestureIsInAttachedView:[longPressGesture locationInView:longPressGesture.view]];
     if (isInView) {
         self.isHighlighted = YES;
         if (longPressGesture.state == UIGestureRecognizerStateEnded) {
-            [self.delegate touchUpEventOnView:self];
             self.isHighlighted = NO;
+            [self.delegate touchUpEventOnView:self];
         }
     } else {
         self.isHighlighted = NO;
@@ -88,6 +91,16 @@
         self.backgroundColor = self.unhighlightedColor;
     }
     _isHighlighted = isHighlighted;
+}
+
+- (void)makeHighlighted
+{
+    self.isHighlighted = YES;
+}
+
+- (void)makeUnhighlighted
+{
+    self.isHighlighted = NO;
 }
 
 @end
