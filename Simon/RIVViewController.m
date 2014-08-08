@@ -11,17 +11,19 @@
 #import "UIColor+RivCustomColors.h"
 #import "RIVColorView.h"
 
-@interface RIVViewController () <UIGestureRecognizerDelegate, RIVColorViewDelegate>
+@interface RIVViewController () <RIVColorViewDelegate>
 
-@property (weak, nonatomic) IBOutlet UILabel *highestLevelAchievedLable;
+@property (weak, nonatomic) IBOutlet UILabel *highestLevelAchievedLabel;
+@property (weak, nonatomic) IBOutlet UILabel *currentLevelLabel;
+@property (weak, nonatomic) IBOutlet UIButton *restartGameButton;
 
 @property (strong, nonatomic) RIVGameBoard *gameboard;
 @property (strong, nonatomic) RIVColorView *redView;
 @property (strong, nonatomic) RIVColorView *greenView;
-@property (strong, nonatomic) UIView *blueView;
-@property (strong, nonatomic) UIView *yellowView;
-@property (strong, nonatomic) UIView *magentaView;
-@property (strong, nonatomic) UIView *cyanView;
+@property (strong, nonatomic) RIVColorView *blueView;
+@property (strong, nonatomic) RIVColorView *yellowView;
+@property (strong, nonatomic) RIVColorView *magentaView;
+@property (strong, nonatomic) RIVColorView *cyanView;
 
 @end
 
@@ -32,8 +34,17 @@
     [super viewDidLoad];
     
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"highestLevelCompleted"];
-    self.highestLevelAchievedLable.text = [NSString stringWithFormat:@"Highest Level Achieved: %d", self.gameboard.highestLevelCompleted];
+    
+    self.gameboard = [[RIVGameBoard alloc] init];
+    self.highestLevelAchievedLabel.text = [NSString stringWithFormat:@"Highest Level Achieved: %d", self.gameboard.highestLevelCompleted];
+    
+    self.restartGameButton.hidden = YES;
+    self.highestLevelAchievedLabel.hidden = YES;
+    self.currentLevelLabel.hidden = YES;
+    
     [self setupColorViews];
+    [self makeColorViewsSelectable:NO];
+    [self moveFirstFourColorViewsInPlace];
 }
 
 - (void)didReceiveMemoryWarning
@@ -45,165 +56,120 @@
 {
     self.redView = [[RIVColorView alloc] initWithHighlightedColor:[UIColor highlightedRed]
                                                unhighlightedColor:[UIColor unhighlightedRed]
-                                                            frame:CGRectMake(20, 118, 130, 130)];
-    self.redView.tag = 10;
+                                                            frame:CGRectMake(20, 118 - 400, 130, 130)];
+    self.redView.tag = 1;
     self.redView.delegate = self;
     [self.view addSubview:self.redView];
     
     self.greenView = [[RIVColorView alloc] initWithHighlightedColor:[UIColor highlightedGreen]
                                                  unhighlightedColor:[UIColor unhighlightedGreen]
-                                                              frame:CGRectMake(170, 118, 130, 130)];
-    self.greenView.tag = 20;
+                                                              frame:CGRectMake(170 + 400, 118, 130, 130)];
+    self.greenView.tag = 2;
     self.greenView.delegate = self;
     [self.view addSubview:self.greenView];
     
+    self.blueView = [[RIVColorView alloc] initWithHighlightedColor:[UIColor highlightedBlue]
+                                                 unhighlightedColor:[UIColor unhighlightedBlue]
+                                                              frame:CGRectMake(20 - 400, 268, 130, 130)];
+    self.blueView.tag = 3;
+    self.blueView.delegate = self;
+    [self.view addSubview:self.blueView];
     
-//    self.redView = [[UIView alloc] initWithFrame:CGRectMake(20, 118, 130, 130)];
-//    self.greenView = [[UIView alloc] initWithFrame:CGRectMake(170, 118, 130, 130)];
-    self.blueView = [[UIView alloc] initWithFrame:CGRectMake(20, 268, 130, 130)];
-    self.yellowView = [[UIView alloc] initWithFrame:CGRectMake(170, 268, 130, 130)];
-    self.magentaView = [[UIView alloc] initWithFrame:CGRectMake(20, 418, 130, 130)];
-    self.cyanView = [[UIView alloc] initWithFrame:CGRectMake(170, 418, 130, 130)];
+    self.yellowView = [[RIVColorView alloc] initWithHighlightedColor:[UIColor highlightedYellow]
+                                                unhighlightedColor:[UIColor unhighlightedYellow]
+                                                             frame:CGRectMake(170, 268 + 400, 130, 130)];
+    self.yellowView.tag = 4;
+    self.yellowView.delegate = self;
+    [self.view addSubview:self.yellowView];
     
-//    [self setupColorView:self.redView withColor:[UIColor unhighlightedRed]];
-//    [self setupColorView:self.greenView withColor:[UIColor unhighlightedGreen]];
-    [self setupColorView:self.blueView withColor:[UIColor unhighlightedBlue]];
-    [self setupColorView:self.yellowView withColor:[UIColor unhighlightedYellow]];
-    [self setupColorView:self.magentaView withColor:[UIColor unhighlightedMagenta]];
-    [self setupColorView:self.cyanView withColor:[UIColor unhighlightedCyan]];
+    self.magentaView = [[RIVColorView alloc] initWithHighlightedColor:[UIColor highlightedMagenta]
+                                                unhighlightedColor:[UIColor unhighlightedMagenta]
+                                                             frame:CGRectMake(20 + 75, 418 + 400, 130, 130)];
+    self.magentaView.tag = 5;
+    self.magentaView.delegate = self;
+    [self.view addSubview:self.magentaView];
     
+    self.cyanView = [[RIVColorView alloc] initWithHighlightedColor:[UIColor highlightedCyan]
+                                                   unhighlightedColor:[UIColor unhighlightedCyan]
+                                                                frame:CGRectMake(170 + 400, 418, 130, 130)];
+    self.cyanView.tag = 6;
+    self.cyanView.delegate = self;
+    [self.view addSubview:self.cyanView];
 }
 
-- (void)touchUpEventOnView:(RIVColorView *)view
+
+#pragma mark - Helper Methods
+
+
+- (void)makeColorViewsSelectable:(BOOL)isSelectable
 {
-    NSLog(@"touched view with tag: %d", view.tag);
+    self.redView.isSelectable = isSelectable;
+    self.greenView.isSelectable = isSelectable;
+    self.blueView.isSelectable = isSelectable;
+    self.yellowView.isSelectable = isSelectable;
+    self.magentaView.isSelectable = isSelectable;
+    self.cyanView.isSelectable = isSelectable;
 }
 
-- (void)setupColorView:(UIView *)view withColor:(UIColor *)color
+- (void)moveFirstFourColorViewsInPlace
 {
-    view.backgroundColor = color;
-    [self.view addSubview:view];
-    
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(testColorPlayed:)];
-    tapGesture.delegate = self;
-    [view addGestureRecognizer:tapGesture];
-    
-    UILongPressGestureRecognizer *longPressedGesture = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(testColorPressed:)];
-    longPressedGesture.minimumPressDuration = 0.001;
-    longPressedGesture.delegate = self;
-    [view addGestureRecognizer:longPressedGesture];
-}
-
-- (void)testColorPressed:(UIGestureRecognizer *)longPressedGesture
-{
-    if (longPressedGesture.state == UIGestureRecognizerStateBegan) {
-        NSLog(@"%@", [longPressedGesture.class description]);
+    [UIView animateWithDuration:1.5 animations:^{
+        self.redView.frame = CGRectMake(20, 118, 130, 130);
+        self.greenView.frame = CGRectMake(170, 118, 130, 130);
+        self.blueView.frame = CGRectMake(20, 268, 130, 130);
+        self.yellowView.frame = CGRectMake(170, 268, 130, 130);
         
-        if ([longPressedGesture.view isEqual:self.redView]) {
-            self.redView.backgroundColor = [UIColor highlightedRed];
-        } else if ([longPressedGesture.view isEqual:self.greenView]) {
-            self.greenView.backgroundColor = [UIColor highlightedGreen];
-        } else if ([longPressedGesture.view isEqual:self.blueView]) {
-            self.blueView.backgroundColor = [UIColor highlightedBlue];
-        } else if ([longPressedGesture.view isEqual:self.yellowView]) {
-            self.yellowView.backgroundColor = [UIColor highlightedYellow];
-        } else if ([longPressedGesture.view isEqual:self.magentaView]) {
-            self.magentaView.backgroundColor = [UIColor highlightedMagenta];
-        } else if ([longPressedGesture.view isEqual:self.cyanView]) {
-            self.cyanView.backgroundColor = [UIColor highlightedCyan];
-        }
-    }
+    } completion:^(BOOL finished) {
+        self.restartGameButton.hidden = NO;
+        self.currentLevelLabel.hidden = NO;
+        self.highestLevelAchievedLabel.hidden = NO;
+//        [self makeColorViewsSelectable:YES];
+    }];
 }
 
-- (void)testColorPlayed:(UIGestureRecognizer *)tapGesture
+- (void)moveFifthColorViewInPlace
 {
-    NSLog(@"%@", [tapGesture.class description]);
-    
-    if ([tapGesture.view isEqual:self.redView]) {
-        self.redView.backgroundColor = [UIColor unhighlightedRed];
-    } else if ([tapGesture.view isEqual:self.greenView]) {
-        self.greenView.backgroundColor = [UIColor unhighlightedGreen];
-    } else if ([tapGesture.view isEqual:self.blueView]) {
-        self.blueView.backgroundColor = [UIColor unhighlightedBlue];
-    } else if ([tapGesture.view isEqual:self.yellowView]) {
-        self.yellowView.backgroundColor = [UIColor unhighlightedYellow];
-    } else if ([tapGesture.view isEqual:self.magentaView]) {
-        self.magentaView.backgroundColor = [UIColor unhighlightedMagenta];
-    } else if ([tapGesture.view isEqual:self.cyanView]) {
-        self.cyanView.backgroundColor = [UIColor unhighlightedCyan];
-    }
+    [UIView animateWithDuration:1.0 animations:^{
+        self.magentaView.frame = CGRectMake(95, 418, 130, 130);
+    } completion:^(BOOL finished) {
+//        [self makeColorViewsSelectable:YES];
+    }];
 }
 
-
-#pragma mark - UIGestureRecognizer Delegate
-
-
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
+- (void)moveSixthColorViewInPlace
 {
-//    NSLog(@"should begin: %@", gestureRecognizer.description);
-    return YES;
+    [UIView animateWithDuration:1.5 animations:^{
+        self.magentaView.frame = CGRectMake(20, 418, 130, 130);
+        self.cyanView.frame = CGRectMake(170, 418, 130, 130);
+    } completion:^(BOOL finished) {
+//        [self makeColorViewsSelectable:YES];
+    }];
 }
 
-- (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldRecognizeSimultaneouslyWithGestureRecognizer:(UIGestureRecognizer *)otherGestureRecognizer
-{
-//    NSLog(@"with: %@, other: %@", [gestureRecognizer.class description], [otherGestureRecognizer.class description]);
-    return YES;
-}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#pragma mark - Play Buttons
+#pragma mark - User Actions
 
 
 - (IBAction)newGamePressed:(UIButton *)sender
 {
-    [self.gameboard newGame];
-    NSLog(@"%@", self.gameboard.colorSequence.description);
+    [UIView animateWithDuration:1.5 animations:^{
+        self.magentaView.frame = CGRectMake(20 + 75, 418 + 400, 130, 130);
+        self.cyanView.frame = CGRectMake(170 + 400, 418, 130, 130);
+    } completion:^(BOOL finished) {
+        self.currentLevelLabel.text = @"Current Level: 0";
+        [self.gameboard newGame];
+        [self makeColorViewsSelectable:YES];
+        NSLog(@"%@", self.gameboard.colorSequence.description);
+    }];
 }
 
-- (IBAction)redPressed:(UIButton *)sender {[self colorPressed:sender];}
-- (IBAction)greenPressed:(UIButton *)sender {[self colorPressed:sender];}
-- (IBAction)bluePressed:(UIButton *)sender {[self colorPressed:sender];}
-- (IBAction)yellowPressed:(UIButton *)sender {[self colorPressed:sender];}
-- (IBAction)magentaPressed:(UIButton *)sender {[self colorPressed:sender];}
-- (IBAction)cyanPressed:(UIButton *)sender {[self colorPressed:sender];}
 
-- (void)colorPressed:(UIButton *)sender
-{
-    const CGFloat *components = CGColorGetComponents(sender.backgroundColor.CGColor);
-    float newRed = (components[0] > 0.5) ? 1.0 : 0.0;
-    float newGreen = (components[1] > 0.5) ? 1.0 : 0.0;
-    float newBlue = (components[2] > 0.5) ? 1.0 : 0.0;
-    
-    sender.backgroundColor = [UIColor colorWithRed:newRed green:newGreen blue:newBlue alpha:1.0];
-}
+#pragma mark - RIVColorView Delegate && related Helper Methods
 
-- (IBAction)colorReleased:(UIButton *)sender
+
+- (void)touchUpEventOnView:(RIVColorView *)view
 {
-    const CGFloat *components = CGColorGetComponents(sender.backgroundColor.CGColor);
-    float newRed = (components[0] > 0.5) ? 0.784 : 0.0;
-    float newGreen = (components[1] > 0.5) ? 0.784 : 0.0;
-    float newBlue = (components[2] > 0.5) ? 0.784 : 0.0;
-    
-    sender.backgroundColor = [UIColor colorWithRed:newRed green:newGreen blue:newBlue alpha:1.0];
-    
-    RIVGameBoardPlayOutcome outcome = [self.gameboard playColor:sender.tag];
+    RIVGameBoardPlayOutcome outcome = [self.gameboard playColor:view.tag];
     [self reflectOutcome:outcome];
 }
 
@@ -211,27 +177,25 @@
 {
     switch (outcome) {
         case RIVGameBoardPlayOutcomeIncorrect:
-//            [self.gameboard newGame];
+            [self makeColorViewsSelectable:NO];
+            self.currentLevelLabel.text = @"Current Level: 0";
+            NSLog(@"game over");
             break;
         case RIVGameBoardPlayOutcomeCorrect:
             break;
         case RIVGameBoardPlayOutcomeLevelComplete:
-            self.highestLevelAchievedLable.text = [NSString stringWithFormat:@"Highest Level Achieved: %d", self.gameboard.highestLevelCompleted];
-            NSLog(@"%@", self.gameboard.colorSequence.description);
+            self.currentLevelLabel.text = [NSString stringWithFormat:@"Current Level: %d", self.gameboard.colorSequence.count - 1];
+            self.highestLevelAchievedLabel.text = [NSString stringWithFormat:@"Highest Level Achieved: %d", self.gameboard.highestLevelCompleted];
+            
+            if (self.gameboard.colorSequence.count == fifthColorLevel) [self moveFifthColorViewInPlace];
+            if (self.gameboard.colorSequence.count == sixthColorLevel) [self moveSixthColorViewInPlace];
+            
+            NSLog(@"%@", [self.gameboard.colorSequence.lastObject description]);
             break;
         case RIVGameBoardPlayOutcomeNotPlayable:
+            NSLog(@"you can't play that");
             break;
     }
-}
-
-
-#pragma mark - Lazy Instantiation
-
-
-- (RIVGameBoard *)gameboard
-{
-    if (!_gameboard) _gameboard = [[RIVGameBoard alloc] init];
-    return _gameboard;
 }
 
 @end

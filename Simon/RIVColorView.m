@@ -56,6 +56,8 @@
 
 - (void)touchWithLongPressGesture:(UILongPressGestureRecognizer *)longPressGesture
 {
+    if (!self.isSelectable) return;
+    
     BOOL isInView = [self gestureIsInAttachedView:[longPressGesture locationInView:longPressGesture.view]];
     if (isInView) {
         self.isHighlighted = YES;

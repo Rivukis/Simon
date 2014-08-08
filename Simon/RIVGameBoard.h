@@ -12,7 +12,7 @@ extern const NSInteger fifthColorLevel;
 extern const NSInteger sixthColorLevel;
 
 typedef NS_ENUM(NSInteger, RIVGameBoardColor) {
-    RIVGameBoardColorRed = 0,
+    RIVGameBoardColorRed = 1,
     RIVGameBoardColorGreen,
     RIVGameBoardColorBlue,
     RIVGameBoardColorYellow,

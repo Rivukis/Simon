@@ -60,17 +60,17 @@ const NSInteger sixthColorLevel = 10;
 
 - (void)advanceToNextRound
 {
-    NSInteger numberOfColorOptions = 4;
-    if (self.colorSequence.count + 1 >= fifthColorLevel) numberOfColorOptions++;
-    if (self.colorSequence.count + 1 >= sixthColorLevel) numberOfColorOptions++;
-    
-    RIVGameBoardColor colorToAdd = arc4random_uniform(numberOfColorOptions);
-    [self.colorSequence addObject:@(colorToAdd)];
-    
     if (self.highestLevelCompleted < self.colorSequence.count) {
         self.highestLevelCompleted = self.colorSequence.count;
         [[NSUserDefaults standardUserDefaults] setInteger:self.highestLevelCompleted forKey:@"highestLevelCompleted"];
     }
+    
+    NSInteger numberOfColorOptions = 4;
+    if (self.colorSequence.count + 1 >= fifthColorLevel) numberOfColorOptions++;
+    if (self.colorSequence.count + 1 >= sixthColorLevel) numberOfColorOptions++;
+    
+    RIVGameBoardColor colorToAdd = arc4random_uniform(numberOfColorOptions) + 1;
+    [self.colorSequence addObject:@(colorToAdd)];
     
     self.nextColorIndex = 0;
 }
