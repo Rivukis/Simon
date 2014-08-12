@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		7A1AADE3199469AC00799084 /* UIColor+RivCustomColors.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A1AADE2199469AC00799084 /* UIColor+RivCustomColors.m */; };
 		7A1AADE61994763600799084 /* RIVColorView.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A1AADE51994763600799084 /* RIVColorView.m */; };
+		7A1AADE91995C5F700799084 /* RIVGame.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A1AADE81995C5F700799084 /* RIVGame.m */; };
+		7A1AADEF1997666400799084 /* RIVLevel.m in Sources */ = {isa = PBXBuildFile; fileRef = 7A1AADEE1997666400799084 /* RIVLevel.m */; };
 		7AAE876A1993197C00B88CFB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AAE87691993197C00B88CFB /* Foundation.framework */; };
 		7AAE876C1993197C00B88CFB /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AAE876B1993197C00B88CFB /* CoreGraphics.framework */; };
 		7AAE876E1993197C00B88CFB /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7AAE876D1993197C00B88CFB /* UIKit.framework */; };
@@ -41,6 +43,10 @@
 		7A1AADE2199469AC00799084 /* UIColor+RivCustomColors.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+RivCustomColors.m"; sourceTree = "<group>"; };
 		7A1AADE41994763600799084 /* RIVColorView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIVColorView.h; sourceTree = "<group>"; };
 		7A1AADE51994763600799084 /* RIVColorView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIVColorView.m; sourceTree = "<group>"; };
+		7A1AADE71995C5F700799084 /* RIVGame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIVGame.h; sourceTree = "<group>"; };
+		7A1AADE81995C5F700799084 /* RIVGame.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIVGame.m; sourceTree = "<group>"; };
+		7A1AADED1997666400799084 /* RIVLevel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RIVLevel.h; sourceTree = "<group>"; };
+		7A1AADEE1997666400799084 /* RIVLevel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RIVLevel.m; sourceTree = "<group>"; };
 		7AAE87661993197C00B88CFB /* Simon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Simon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7AAE87691993197C00B88CFB /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		7AAE876B1993197C00B88CFB /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -176,6 +182,10 @@
 			children = (
 				7AAE87A0199319BC00B88CFB /* RIVGameBoard.h */,
 				7AAE87A1199319BC00B88CFB /* RIVGameBoard.m */,
+				7A1AADE71995C5F700799084 /* RIVGame.h */,
+				7A1AADE81995C5F700799084 /* RIVGame.m */,
+				7A1AADED1997666400799084 /* RIVLevel.h */,
+				7A1AADEE1997666400799084 /* RIVLevel.m */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -290,9 +300,11 @@
 			buildActionMask = 2147483647;
 			files = (
 				7A1AADE3199469AC00799084 /* UIColor+RivCustomColors.m in Sources */,
+				7A1AADEF1997666400799084 /* RIVLevel.m in Sources */,
 				7AAE87A2199319BC00B88CFB /* RIVGameBoard.m in Sources */,
 				7AAE877A1993197C00B88CFB /* RIVAppDelegate.m in Sources */,
 				7AAE87761993197C00B88CFB /* main.m in Sources */,
+				7A1AADE91995C5F700799084 /* RIVGame.m in Sources */,
 				7A1AADE61994763600799084 /* RIVColorView.m in Sources */,
 				7AAE87801993197C00B88CFB /* RIVViewController.m in Sources */,
 			);
